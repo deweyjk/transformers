@@ -265,8 +265,14 @@ def evaluate(args, model, tokenizer, prefix=""):
     logger.info("  Evaluation done in total %f secs (%f sec per example)", evalTime, evalTime / len(dataset))
 
     # Compute predictions
-    output_prediction_file = os.path.join(args.output_dir, "predictions_{}.json".format(prefix))
-    output_nbest_file = os.path.join(args.output_dir, "nbest_predictions_{}.json".format(prefix))
+    if args.output_prediction_file:
+        output_prediction_file = args.output_prediction_file
+    else:
+        output_prediction_file = os.path.join(args.output_dir, "predictions_{}.json".format(prefix))
+    if args.output_nbest_file:
+        output_nbest_file = args.output_nbest_file
+    else:
+        output_nbest_file = os.path.join(args.output_dir, "nbest_predictions_{}.json".format(prefix))
     if args.version_2_with_negative:
         output_null_log_odds_file = os.path.join(args.output_dir, "null_odds_{}.json".format(prefix))
     else:
@@ -448,6 +454,8 @@ def main():
                              "See details at https://nvidia.github.io/apex/amp.html")
     parser.add_argument('--server_ip', type=str, default='', help="Can be used for distant debugging.")
     parser.add_argument('--server_port', type=str, default='', help="Can be used for distant debugging.")
+    parser.add_argument('--output_prediction_file', default=None, help='Path to predictions.json')
+    parser.add_argument('--output_nbest_file', default=None, help='Path to nbest_predictions.json')
     args = parser.parse_args()
 
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and args.do_train and not args.overwrite_output_dir:
@@ -549,6 +557,7 @@ def main():
     if args.do_eval and args.local_rank in [-1, 0]:
         checkpoints = [args.output_dir]
         if args.eval_all_checkpoints:
+            logger.warn('Enabling eval_all_checkpoints destroys model!')
             checkpoints = list(os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + '/**/' + WEIGHTS_NAME, recursive=True)))
             logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce model loading logs
 
