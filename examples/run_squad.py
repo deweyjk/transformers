@@ -360,7 +360,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--train_file", default=None, type=str, required=True,
+    parser.add_argument("--train_file", default=None, type=str, required=False,
                         help="SQuAD json for training. E.g., train-v1.1.json")
     parser.add_argument("--predict_file", default=None, type=str, required=True,
                         help="SQuAD json for predictions. E.g., dev-v1.1.json or test-v1.1.json")
